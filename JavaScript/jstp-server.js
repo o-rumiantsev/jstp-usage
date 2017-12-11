@@ -1,9 +1,10 @@
 'use strict';
 
 const jstp = require('metarhia-jstp');
-const api = {};
+const api1 = {};
+const api2 = {};
 
-const interfaces = {
+const interfaces1 = {
   operator: {
     add(connection, [...args], callback) {
       const result = args.reduce((acc, val) => acc + val);
@@ -28,10 +29,22 @@ const interfaces = {
   }
 }
 
-Object.assign(api, interfaces);
+Object.assign(api1, interfaces1);
 
-const app = new jstp.Application('jstpApp', api);
-const config = { applications: [app] };
+const interfaces2 = {
+  someInterface: {
+    someMethod(connection, callback) {
+      console.log('Called method someMethod');
+      callback(null, 'someMethod executed');
+    }
+  }
+}
+
+Object.assign(api2, interfaces2);
+
+const app1 = new jstp.Application('jstpApp-1', api1);
+const app2 = new jstp.Application('jstpApp-2', api2);
+const config = { applications: [app1, app2] };
 const server = jstp.net.createServer(config);
 
 server.listen(8080);
