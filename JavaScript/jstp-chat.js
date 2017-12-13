@@ -1,6 +1,10 @@
 'use strict';
 
 const jstp = require('metarhia-jstp');
+const readline = require('readline');
+
+let connection;
+let username;
 
 function eventCallback(interfaceName, eventName, msg) {
   if (interfaceName === 'clientInterface' && eventName === 'msg') {
@@ -8,10 +12,27 @@ function eventCallback(interfaceName, eventName, msg) {
   }
 }
 
-jstp.net.connect('chat', null, 3000, 'localhost', (err, connection) => {
-  connection.on('event', eventCallback);
+jstp.net.connect('chat', null, 3000, 'localhost', (err, conn) => {
+  conn.on('event', eventCallback);
+  connection = conn;
+});
 
-  connection.callMethod('clientInterface', 'messager', ['hello'], (err) => {
-    if (err) console.error(err);
-  });
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt: ''
+});
+
+rl.question('Username: ', (name) => {
+  username = name;
+  rl.prompt();
+});
+
+rl.on('line', (line) => {
+  connection.callMethod(
+    'clientInterface', 'messager', [username, line], (err) => {
+      if (err) console.error(err);
+    }
+  );
+  rl.prompt();
 });
