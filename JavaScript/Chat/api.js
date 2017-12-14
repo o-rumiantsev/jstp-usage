@@ -1,7 +1,5 @@
 'use strict';
 
-const jstp = require('metarhia-jstp');
-
 const api = {};
 api.connections = new Set();
 
@@ -38,8 +36,5 @@ const interfaces = {
 };
 
 Object.assign(api, interfaces);
-console.log(api);
 
-const app = new jstp.Application('chat', api);
-
-module.exports = app;
+module.exports = api;
