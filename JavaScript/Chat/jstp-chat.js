@@ -17,7 +17,6 @@ function connectionClose() {
     if (err) console.error(err.message);
   });
   connection.close();
-  rl.prompt = () => {};
   rl.close();
 }
 
@@ -57,6 +56,6 @@ rl.on('line', (line) => {
   } else {
     const msg = [username, line];
     sendMsg(msg);
+    rl.prompt();
   }
-  rl.prompt();
 });
