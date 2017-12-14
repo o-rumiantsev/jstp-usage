@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const jstp = require('metarhia-jstp');
 const readline = require('readline');
 
@@ -28,10 +29,22 @@ function sendMsg(msg) {
   );
 }
 
+function sendFile(filenames) {
+  filenames.forEach(filename => {
+    const file = fs.readFileSync('./' + filename, 'utf8');
+    connection.callMethod(
+      'clientInterface', 'catchFile', [filename, file], (err) => {
+        if (err) console.error(err.message);
+      }
+    );
+  });
+}
+
 jstp.net.connect('chat', null, 3000, 'localhost', (err, conn) => {
   conn.on('event', eventCallback);
   conn.on('close', () => {
     console.log('Connection closed');
+    rl.close();
   });
   conn.callMethod('clientInterface', 'connectionListener', [], (err) => {
     if (err) console.error(err);
@@ -53,6 +66,10 @@ rl.question('Username: ', (name) => {
 rl.on('line', (line) => {
   if (line === 'exit') {
     connectionClose();
+  } else if (line.startsWith('send ')) {
+    const filenames = line.split(' ').slice(1);
+    sendFile(filenames);
+    rl.prompt();
   } else {
     const msg = [username, line];
     sendMsg(msg);

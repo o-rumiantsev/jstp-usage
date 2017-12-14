@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const api = {};
 api.connections = new Set();
 
@@ -15,6 +16,13 @@ function messager(connection, username, msg, callback) {
   callback(null);
 }
 
+function catchFile(connection, name, data, callback) {
+  const path = './downloads/' + name;
+  fs.writeFile(path, data, (err) => {
+    if (err) console.log(err.message);
+  });
+  callback(null);
+}
 function connectionListener(connection, callback) {
   console.log('incomming connection');
   api.connections.add(connection);
@@ -31,6 +39,7 @@ const interfaces = {
   clientInterface: {
     messager,
     connectionListener,
+    catchFile,
     close
   }
 };
