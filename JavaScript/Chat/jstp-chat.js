@@ -52,8 +52,7 @@ function downloadFiles(names) {
   names.forEach(name => {
     if (downloadList.has(name)) {
       const path = './downloads/' + name;
-      const data = downloadList[name];
-      console.log(data);
+      const data = downloadList.get(name);
       fs.writeFile(path, data, (err) => {
         if (err) console.error(err.message);
       });
