@@ -4,12 +4,20 @@ const fs = require('fs');
 const jstp = require('metarhia-jstp');
 const readline = require('readline');
 
+const downloadList = new Map();
 let connection;
 let username;
 
-function eventCallback(interfaceName, eventName, msg) {
-  if (interfaceName === 'clientInterface' && eventName === 'msg') {
+function eventCallback(interfaceName, eventName, ...args) {
+  if (eventName === 'msg') {
+    const msg = args[0];
     console.log(msg);
+  } else if (eventName === 'file') {
+    const file = args[0];
+    const name = file[0];
+    const data = file[1];
+    console.log('file ' + name + ' recieved');
+    downloadList.set(name, data);
   }
 }
 
@@ -31,12 +39,25 @@ function sendMsg(msg) {
 
 function sendFile(filenames) {
   filenames.forEach(filename => {
-    const file = fs.readFileSync('./' + filename, 'utf8');
+    const data = fs.readFileSync('./' + filename, 'utf8');
     connection.callMethod(
-      'clientInterface', 'catchFile', [filename, file], (err) => {
+      'clientInterface', 'catchFile', [filename, data], (err) => {
         if (err) console.error(err.message);
       }
     );
+  });
+}
+
+function downloadFiles(names) {
+  names.forEach(name => {
+    if (downloadList.has(name)) {
+      const path = './downloads/' + name;
+      const data = downloadList[name];
+      console.log(data);
+      fs.writeFile(path, data, (err) => {
+        if (err) console.error(err.message);
+      });
+    }
   });
 }
 
@@ -69,6 +90,10 @@ rl.on('line', (line) => {
   } else if (line.startsWith('send ')) {
     const filenames = line.split(' ').slice(1);
     sendFile(filenames);
+    rl.prompt();
+  } else if (line.startsWith('download ')){
+    const filenames = line.split(' ').slice(1);
+    downloadFiles(filenames);
     rl.prompt();
   } else {
     const msg = [username, line];

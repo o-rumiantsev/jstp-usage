@@ -17,9 +17,11 @@ function messager(connection, username, msg, callback) {
 }
 
 function catchFile(connection, name, data, callback) {
-  const path = './downloads/' + name;
-  fs.writeFile(path, data, (err) => {
-    if (err) console.log(err.message);
+  const file = [name, data];
+  api.connections.forEach(conn => {
+    if (conn !== connection) {
+      conn.emitRemoteEvent('clientInterface', 'file', file);
+    }
   });
   callback(null);
 }
