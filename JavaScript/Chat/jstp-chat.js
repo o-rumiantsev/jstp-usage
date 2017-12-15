@@ -4,9 +4,14 @@ const fs = require('fs');
 const jstp = require('metarhia-jstp');
 const readline = require('readline');
 
-const downloadList = new Map();
 let connection;
 let username;
+const downloadList = new Map();
+
+const imageExtensions = new Set([
+  'png', 'jpg', 'jpeg', 'tif', 'bmp',
+  'svg', 'gif', 'psd', 'tiff', 'pdf'
+]);
 
 function eventCallback(interfaceName, eventName, ...args) {
   if (eventName === 'msg') {
@@ -53,11 +58,24 @@ function downloadFiles(names) {
     if (downloadList.has(name)) {
       const path = './downloads/' + name;
       const data = downloadList.get(name);
-      fs.writeFile(path, data, (err) => {
-        if (err) console.error(err.message);
-      });
+      if (isImage(name)) {
+        fs.writeFile(path, data, null,(err) => {
+          if (err) console.error(err.message);
+        });
+      } else {
+        fs.writeFile(path, data, (err) => {
+          if (err) console.error(err.message);
+        });
+      }
     }
   });
+}
+
+function isImage(filename) {
+  const index = filename.lastIndexOf('.');
+  const ext = filename.substr(index + 1);
+  if (imageExtensions.has(ext)) return true;
+  else return false;
 }
 
 jstp.net.connect('chat', null, 3000, 'localhost', (err, conn) => {
