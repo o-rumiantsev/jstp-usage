@@ -68,16 +68,13 @@ function sendFiles(connection, filenames) {
   filenames.forEach(filename => {
     fs.readFile('./' + filename, (err, buffer) => {
       if (err) console.error(err.message);
-      else {
-        if (buffer.length > MAX_BUFFER_LENGTH) sendByParts(
-          connection, filename, buffer
-        );
-        else connection.callMethod(
-          'clientInterface', 'catchFile', [filename, buffer], (err) => {
-            if (err) console.error(err.message);
-          }
-        );
-      }
+      else if (buffer.length > MAX_BUFFER_LENGTH) {
+        sendByParts(connection, filename, buffer);
+      } else connection.callMethod(
+        'clientInterface', 'catchFile', [filename, buffer], (err) => {
+          if (err) console.error(err.message);
+        }
+      );
     });
   });
 }
@@ -145,4 +142,4 @@ module.exports = {
   sendFiles,
   downloadFiles,
   addFileToList
-}
+};
