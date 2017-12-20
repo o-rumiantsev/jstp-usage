@@ -16,8 +16,7 @@ const imageExtensions = new Set([
 //  obj - object ot parse
 //
 function objToBuffer(obj) {
-  const buf = new Uint16Array(obj.length);
-  for (let i in obj) buf[i] = obj[i];
+  const buf = new Uint16Array(obj);
   const buffer = Buffer.from(buf);
   return buffer;
 }
@@ -136,10 +135,8 @@ function addFileToList(file, map) {
   if (map.has(name)) {
     const prevObj = map.get(name);
     const prevBuffer = objToBuffer(prevObj);
-    console.log(prevObj.length);
     const totalLength = buffer.length + prevBuffer.length;
     const bufferConcat = Buffer.concat([prevBuffer, buffer], totalLength);
-    console.log(bufferConcat.length);
     map.set(name, bufferConcat);
   } else map.set(name, data);
 }
