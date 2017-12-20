@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+
 const api = {};
 api.connections = new Set();
 
@@ -18,7 +19,9 @@ function messager(connection, username, msg, callback) {
 
 function catchFile(connection, name, data, callback) {
   const buffer = [];
+  console.log('cought', name);
   for (let i in data) buffer.push(data[i]);
+  console.log(buffer.length);
   const file = [name, buffer];
   api.connections.forEach(conn => {
     if (conn !== connection) {
