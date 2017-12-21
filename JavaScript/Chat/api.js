@@ -16,11 +16,8 @@ function messager(connection, username, msg, callback) {
 }
 
 function catchFile(connection, name, data, callback) {
-  const buffer = [];
   console.log('cought', name);
-  for (const i in data) buffer.push(data[i]);
-  console.log(buffer.length);
-  const file = [name, buffer];
+  const file = [name, data];
   api.connections.forEach(conn => {
     if (conn !== connection) {
       conn.emitRemoteEvent('clientInterface', 'file', file);

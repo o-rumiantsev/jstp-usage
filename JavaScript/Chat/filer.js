@@ -43,18 +43,19 @@ function sendByParts(connection, filename, buf) {
 
   const callMethod = (file) => (data, callback) => connection.callMethod(
     'clientInterface', 'catchFile', file, (err) => {
-      console.log('callMethod', file[0]);
       if (err) console.error(err.message);
       callback(null);
     }
   );
 
   const sequence = [];
+
   parts.forEach(part => sequence.push(callMethod(part)));
 
   const flow = metasync(sequence);
   flow({}, (err) => {
     if (err) console.error(err.message);
+    console.log('file ' + filename + ' sent');
   });
 }
 
@@ -127,7 +128,6 @@ function addFileToList(file, map) {
   const name = file[0];
   const data = file[1];
   const buffer = objToBuffer(data);
-  console.log('length ' + buffer.length);
   console.log('file ' + name + ' recieved');
   if (map.has(name)) {
     const prevObj = map.get(name);
